@@ -67,19 +67,6 @@ export const constantRoutes = [
       }
     ]
   },
-  // {
-  //   path: '/sms',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'sms',
-  //       component: () => import('@/views/sms/index'),
-  //       meta: { title: '小程序短链接', icon: 'form' }
-  //     }
-  //   ]
-  // },
-
   {
     path: '/idcard',
     component: Layout,
@@ -101,19 +88,6 @@ export const constantRoutes = [
         name: 'xss',
         component: () => import('@/views/xss/index'),
         meta: { title: '富文本 xss 转换', icon: 'el-icon-s-help' }
-      }
-    ]
-  },
-  {
-    path: '/links',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: 'index',
-        name: 'links',
-        component: () => import('@/views/links/index'),
-        meta: { title: '辅助链接', icon: 'el-icon-s-help' }
       }
     ]
   },

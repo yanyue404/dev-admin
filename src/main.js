@@ -10,7 +10,7 @@ import '@/styles/index.scss' // 全局样式
 
 import App from './App'
 import store from './store'
-import router from './router'
+import router from './router.js'
 
 import '@/icons' // icon图标集成（svg）
 import '@/permission' // 权限控制

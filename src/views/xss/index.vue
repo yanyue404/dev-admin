@@ -1,6 +1,6 @@
 <template>
   <div class="p-commodity">
-    <h3>cms 复制过来的富文本:</h3>
+    <h3>复制过来的富文本:</h3>
     <textarea v-model="text"></textarea>
     <h3>处理后的：</h3>
     <textarea v-model="removeXssText"></textarea>
@@ -48,7 +48,7 @@ export default {
     removeXssText: {
       get() {
         try {
-          return xssFilter.process(this.text)
+          return xssFilter.process(this.text).replace(/\s+style=\"\"/g, "");
         } catch (err) {
           console.log(err)
         }

@@ -6,14 +6,17 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '小工具项目' // page title
+
+const isDev = process.env.NODE_ENV === 'development'
+
+const name = defaultSettings.title || 'Dev Admin' // page title
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
 // For example, Mac: sudo npm run
 // You can change the port by the following methods:
 // port = 9528 npm run dev OR npm run dev --port = 9528
-const port = process.env.port || process.env.npm_config_port || 9528 // dev port
+const port = process.env.port || process.env.npm_config_port || 9527 // dev port
 
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
@@ -27,7 +30,7 @@ module.exports = {
   // publicPath: '/',
   // outputDir: 'dist',
   // assetsDir: 'static',
-  publicPath: '/smallfunc',
+  publicPath: '/dev-admin',
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
@@ -48,7 +51,8 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
-    }
+    },
+    devtool: isDev ? "source-map" : ''
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
@@ -79,7 +83,7 @@ module.exports = {
       })
       .end()
 
-    config.when(process.env.NODE_ENV !== 'development', (config) => {
+    config.when(isDev, (config) => {
       config
         .plugin('ScriptExtHtmlWebpackPlugin')
         .after('html')

@@ -1,2 +1,7 @@
-# smallfunc
-是自己用的小工具呀！
+# dev-admin
+
+Admin tools for development.
+
+### Related Project
+
+[vue-admin-template](https://github.com/PanJiaChen/vue-admin-template/tree/4.4.0)

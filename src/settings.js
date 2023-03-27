@@ -1,5 +1,5 @@
 module.exports = {
-  title: '小工具项目',
+  title: 'Dev Admin',
   tagsView: true,
   /**
    * @type {boolean} true | false

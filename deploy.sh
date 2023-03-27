@@ -20,6 +20,6 @@ git commit -m 'build: deploy dist'
 # git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git master
 
 # 如果发布到 https://<USERNAME>.github.io/<REPO>
-git push -f https://github.com/yanyue404/smallfunc.git master:gh-pages
+git push -f https://github.com/yanyue404/dev-admin.git master:gh-pages
 
 cd -
