@@ -41,6 +41,7 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
+
   {
     path: '/',
     component: Layout,
@@ -50,10 +51,11 @@ export const constantRoutes = [
         path: 'qrcode',
         name: 'qrcode',
         component: () => import('@/views/qrcode/index'),
-        meta: { title: '二维码生成器', icon: 'link' }
+        meta: { title: '二维码生成器', icon: 'el-icon-link' }
       }
     ]
   },
+
   {
     path: '/rate',
     component: Layout,
@@ -80,6 +82,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/clipboard2markdown',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'clipboard2markdown',
+        component: () => import('@/views/clipboard2markdown/index'),
+        meta: { title: '富文本转 markdown', icon: 'el-icon-document-copy' }
+      }
+    ]
+  },
+  {
     path: '/xss',
     component: Layout,
     children: [
@@ -87,7 +101,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'xss',
         component: () => import('@/views/xss/index'),
-        meta: { title: '富文本 xss 转换', icon: 'el-icon-s-help' }
+        meta: { title: '富文本 xss 转换', icon: 'el-icon-document-remove' }
       }
     ]
   },
