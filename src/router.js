@@ -106,6 +106,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: "/clickArea",
+    component: Layout,
+    children: [
+      {
+        path: "index",
+        name: "base64",
+        component: () => import("@/views/clickArea/index"),
+        meta: { title: "图片点击区域", icon: "el-icon-picture" }
+      }
+    ]
+  },
+  {
     path: '/example',
     component: Layout,
     redirect: '/example/table',

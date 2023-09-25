@@ -52,7 +52,12 @@ module.exports = {
         '@': resolve('src')
       }
     },
-    devtool: isDev ? "source-map" : ''
+    devtool: isDev ? "source-map" : '',
+    externals: {
+      'vue':'Vue',
+      'element-ui':'ELEMENT',
+      'highlight.js':'hljs',
+    }
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
