@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dev Admin 壳层原型</title>
+  <style>
+    [class^="el-icon-"], [class*=" el-icon-"] { font-style: normal; }
+    [class^="el-icon-"]::before, [class*=" el-icon-"]::before { font-family: "Segoe UI Symbol", "Segoe UI", sans-serif; }
+    .el-icon-link::before { content: "⌗"; }
+    .el-icon-bank-card::before { content: "▣"; }
+    .el-icon-s-unfold::before { content: "{ }"; font-size: 11px; }
+    .el-icon-s-operation::before { content: "☰"; }
+    .el-icon-document::before, .el-icon-document-copy::before, .el-icon-document-remove::before, .el-icon-tickets::before, .el-icon-notebook-2::before { content: "☰"; }
+    .el-icon-refresh::before { content: "↻"; }
+    .el-icon-share::before { content: "⤷"; }
+    .el-icon-picture::before, .el-icon-picture-outline::before { content: "▢"; }
+    .el-icon-connection::before { content: "⇄"; }
+    .el-icon-search::before { content: "⌕"; }
+    .el-icon-data-analysis::before { content: "▤"; }
+    .el-icon-arrow-right::before { content: "›"; }
+    .el-icon-moon::before { content: "☾"; }
+    .el-icon-sunny::before { content: "☀"; }
+    .el-icon-close::before { content: "×"; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    button, input { font: inherit; color: inherit; }
+    button { background: none; border: 0; padding: 0; cursor: pointer; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .root {
+      --bg: #f4f5f7; --surface: #fff; --side: #fbfbfc; --rail: #fff;
+      --ink: #1b1e27; --muted: #5c6573; --faint: #8b93a1; --line: #e6e8ee;
+      --hover: #eef0f3; --accent: #1d4ed8; --accent-ink: #1d4ed8;
+      --accent-soft: #e8efff; --on: #fff; --ok: #067647; --ok-soft: #e7f6ee; --input: #fff;
+      height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--ink);
+    }
+    .root[data-theme="dark"] {
+      --bg: #12141a; --surface: #1b1e27; --side: #16181f; --rail: #101218;
+      --ink: #eceef2; --muted: #a4acb9; --faint: #7d8694; --line: #2c313c;
+      --hover: #242833; --accent: #2563eb; --accent-ink: #9ec5ff;
+      --accent-soft: rgba(37, 99, 235, 0.22); --ok: #75e0a7; --ok-soft: rgba(18, 183, 106, 0.16); --input: #14171e;
+    }
+    .chosen {
+      flex: 0 0 auto; padding: 8px 16px; background: #3a2a12; color: #f6d7a2; font-size: 12px;
+    }
+    .stage { flex: 1; min-height: 0; }
+    .layout, .layout-b, .layout-c { height: 100%; }
+    .layout { display: flex; }
+    .side { width: 232px; flex: 0 0 232px; background: var(--side); border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+    .brand { height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+    .mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: var(--on); font-weight: 700; display: grid; place-items: center; }
+    .brand em { display: block; margin-top: 2px; font-style: normal; color: var(--faint); font-size: 12px; }
+    .nav { overflow: auto; padding: 8px 10px 16px; }
+    .nav h2 { margin: 14px 8px 6px; color: var(--faint); font-size: 12px; }
+    .item, .tool, .chip, .tab { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; color: inherit; }
+    .item { height: 34px; padding: 0 8px; border-radius: 8px; }
+    .item i, .rail-btn i { color: var(--muted); }
+    .item:hover, .tool:hover, .chip:hover { background: var(--hover); }
+    .item.on, .tool.on, .chip.on, .rail-btn.on { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+    .item.on i { color: var(--accent-ink); }
+    .work, .main, .layout-c { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+    .top, .bar { height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+    .path { flex: 1; display: flex; align-items: center; gap: 6px; color: var(--muted); }
+    .path strong, .head h1 { color: var(--ink); }
+    .search { position: relative; width: 220px; height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--input); }
+    .search input { width: 100%; border: 0; outline: none; background: transparent; }
+    .menu { position: absolute; top: 40px; right: 0; z-index: 5; width: 240px; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+    .menu button { width: 100%; height: 32px; padding: 0 8px; border-radius: 6px; display: flex; justify-content: space-between; }
+    .menu button:hover { background: var(--hover); }
+    .theme { width: 34px; height: 34px; border-radius: 8px; color: var(--muted); }
+    .theme:hover { background: var(--hover); color: var(--ink); }
+    .tabs { display: flex; gap: 4px; overflow-x: auto; background: var(--surface); border-bottom: 1px solid var(--line); padding: 0 12px; }
+    .tab { width: auto; height: 40px; padding: 0 8px; color: var(--muted); position: relative; flex: 0 0 auto; }
+    .tab.on { color: var(--ink); font-weight: 600; }
+    .tab.on::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 0; height: 2px; background: var(--accent); }
+    .tab .x { opacity: 0; }
+    .tab:hover .x, .tab.on .x { opacity: 1; }
+    .canvas { flex: 1; overflow: auto; padding: 22px 28px 96px; background: var(--bg); }
+    .kicker { margin: 0 0 8px; color: var(--faint); font-size: 12px; }
+    .head h1 { margin: 0; font-size: 22px; }
+    .head p { margin: 6px 0 0; color: var(--muted); }
+    .sheet { margin-top: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .banner { padding: 10px 12px; border-radius: 8px; background: var(--accent-soft); color: var(--accent-ink); }
+    .banner p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+    .card { min-height: 84px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
+    .card.ok { background: var(--ok-soft); border-color: transparent; }
+    .card span { display: block; color: var(--faint); font-size: 12px; }
+    .card strong { display: block; margin-top: 6px; }
+    .layout-b { display: flex; }
+    .rail { width: 72px; flex: 0 0 72px; background: var(--rail); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+    .rail .mark { margin-bottom: 12px; }
+    .rail-btn { width: 56px; height: 52px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--muted); margin-bottom: 4px; }
+    .rail-btn span { font-size: 11px; }
+    .grow { flex: 1; }
+    .panel { width: 208px; flex: 0 0 208px; background: var(--side); border-right: 1px solid var(--line); padding: 14px 10px; }
+    .panel header { display: flex; justify-content: space-between; padding: 0 6px 10px; }
+    .panel header em { display: block; font-style: normal; color: var(--faint); font-size: 12px; }
+    .tool { height: 34px; padding: 0 10px; border-radius: 8px; }
+    .tabbar { height: 48px; display: flex; align-items: flex-end; gap: 8px; padding: 8px 12px 0; }
+    .tabbar .tabs { flex: 1; border: 0; background: transparent; padding: 0; }
+    .tabbar .tab.on { background: var(--surface); border: 1px solid var(--line); border-bottom: 0; border-radius: 10px 10px 0 0; }
+    .tabbar .tab.on::after { display: none; }
+    .layout-b .canvas { background: var(--surface); border-top: 1px solid var(--line); }
+    .seg { display: flex; padding: 3px; border-radius: 10px; background: var(--hover); }
+    .seg button { height: 28px; padding: 0 14px; border-radius: 8px; color: var(--muted); }
+    .seg button.on { background: var(--surface); color: var(--ink); font-weight: 600; }
+    .tools { display: flex; gap: 4px; overflow-x: auto; padding: 8px 16px; }
+    .chip { width: auto; height: 30px; padding: 0 10px; border-radius: 8px; color: var(--muted); flex: 0 0 auto; }
+    .switcher { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .pill { display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; background: #141414; color: #f5f5f5; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    .pill .tag { margin-left: 8px; color: #f5c16c; font-size: 10px; letter-spacing: .08em; }
+    .pill .label { min-width: 148px; text-align: center; font-weight: 600; }
+    .arrow { width: 32px; height: 32px; border-radius: 999px; color: #fff; font-size: 20px; }
+    .arrow:hover { background: #2a2a2a; }
+    .state { max-width: 720px; padding: 4px 12px; border-radius: 999px; background: rgba(20,20,20,.92); color: #d5d5d5; font-family: Consolas, monospace; font-size: 11px; }
+    @media (max-width: 1100px) { .cards { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <div id="app" class="root" data-theme="light"></div>
+  <script>
+    var GROUPS = [
+      { id: 'code', name: '编码', icon: 'el-icon-s-operation', tools: [
+        { id: 'qrcode', name: '二维码生成器', icon: 'el-icon-link', blurb: '把文本或链接生成二维码' },
+        { id: 'idcard', name: '身份证号码', icon: 'el-icon-bank-card', blurb: '校验并解析身份证号' },
+        { id: 'json', name: 'JSON 美化', icon: 'el-icon-s-unfold', blurb: '格式化或压缩 JSON' },
+        { id: 'diff', name: '文本/JSON Diff', icon: 'el-icon-s-operation', blurb: '对比两段文本或 JSON' }
+      ]},
+      { id: 'doc', name: '文档', icon: 'el-icon-document', tools: [
+        { id: 'docx', name: 'Word 转富文本', icon: 'el-icon-document-copy', blurb: '把 docx 转成 HTML' },
+        { id: 'wordpdf', name: 'Word 与 PDF 互转', icon: 'el-icon-refresh', blurb: '在 Word 与 PDF 之间转换' },
+        { id: 'xss', name: '富文本 XSS 转换', icon: 'el-icon-document-remove', blurb: '清洗富文本里的脚本' },
+        { id: 'md', name: '富文本转 Markdown', icon: 'el-icon-notebook-2', blurb: '把剪贴板 HTML 转成 Markdown' },
+        { id: 'mermaid', name: 'Mermaid 图表', icon: 'el-icon-share', blurb: '编写并预览 Mermaid' },
+        { id: 'markdown', name: 'Markdown 编辑器', icon: 'el-icon-tickets', blurb: '编写 Markdown' }
+      ]},
+      { id: 'media', name: '媒体', icon: 'el-icon-picture-outline', tools: [
+        { id: 'click', name: '图片点击区域', icon: 'el-icon-picture', blurb: '在图片上标注热区' },
+        { id: 'compress', name: '图片压缩', icon: 'el-icon-picture-outline', blurb: '压缩图片体积' }
+      ]},
+      { id: 'net', name: '网络', icon: 'el-icon-connection', tools: [
+        { id: 'regex', name: '正则表达式测试器', icon: 'el-icon-search', blurb: '调试正则表达式' },
+        { id: 'http', name: 'HTTP 请求模拟器', icon: 'el-icon-connection', blurb: '组装并查看请求' },
+        { id: 'url', name: 'URL 编码/解码', icon: 'el-icon-link', blurb: '编码或解码 URL' },
+        { id: 'site', name: '网站信息', icon: 'el-icon-data-analysis', blurb: '查看响应头、缓存与部署时间' }
+      ]}
+    ]
+    var VARIANTS = [
+      { key: 'A', name: '分组侧栏' },
+      { key: 'B', name: '图标轨' },
+      { key: 'C', name: '顶栏画布' }
+    ]
+    var state = { variant: 'A', theme: 'light', tabs: ['qrcode', 'json', 'site'], activeId: 'site', groupId: 'net', panelOpen: true, query: '' }
+
+    function flat() {
+      var list = []
+      GROUPS.forEach(function (group) {
+        group.tools.forEach(function (tool) {
+          list.push({ id: tool.id, name: tool.name, icon: tool.icon, blurb: tool.blurb, groupId: group.id, groupName: group.name })
+        })
+      })
+      return list
+    }
+    function byId(id) {
+      var list = flat()
+      for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]
+      return null
+    }
+    function groupById(id) {
+      for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].id === id) return GROUPS[i]
+      return GROUPS[0]
+    }
+    function esc(text) {
+      return String(text).replace(/[&<>"]/g, function (ch) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]
+      })
+    }
+    function icon(name) { return '<i class="' + esc(name) + '"></i>' }
+
+    function canvas(tool) {
+      if (!tool) return '<div class="canvas"><p>还没有打开的工具</p></div>'
+      return '<div class="canvas"><p class="kicker">公共画布 · 各工具页共用，只跟随黑白主题</p><header class="head"><h1>' + esc(tool.name) + '</h1><p>' + esc(tool.blurb) + '</p></header><section class="sheet"><div class="banner"><strong>示意内容</strong><p>各工具页共用这一块版式。正式输入和结果留在各自页面里。</p></div><div class="cards"><article class="card ok"><span>部署/更新时间</span><strong>ETag 标识</strong></article><article class="card"><span>服务器</span><strong>未披露</strong></article><article class="card"><span>协议</span><strong>HTTPS</strong></article><article class="card"><span>资源信息</span><strong>javascript · utf-8</strong></article></div></section></div>'
+    }
+    function tabsHtml() {
+      return state.tabs.map(function (id) {
+        var tool = byId(id)
+        if (!tool) return ''
+        var on = tool.id === state.activeId ? ' on' : ''
+        return '<button class="tab' + on + '" data-act="activate" data-id="' + tool.id + '">' + icon(tool.icon) + '<span>' + esc(tool.name) + '</span><i class="el-icon-close x" data-act="close" data-id="' + tool.id + '"></i></button>'
+      }).join('')
+    }
+    function searchHtml() {
+      var hits = ''
+      if (state.query) {
+        var q = state.query.toLowerCase()
+        hits = '<ul class="menu">' + flat().filter(function (tool) {
+          return tool.name.toLowerCase().indexOf(q) !== -1
+        }).slice(0, 8).map(function (tool) {
+          return '<li><button data-act="open" data-id="' + tool.id + '"><span>' + esc(tool.name) + '</span><em>' + esc(tool.groupName) + '</em></button></li>'
+        }).join('') + '</ul>'
+      }
+      return '<label class="search"><i class="el-icon-search"></i><input id="q" placeholder="搜索工具" value="' + esc(state.query) + '" />' + hits + '</label>'
+    }
+    function themeBtn() {
+      var name = state.theme === 'light' ? 'el-icon-moon' : 'el-icon-sunny'
+      return '<button class="theme" data-act="theme" title="切换主题">' + icon(name) + '</button>'
+    }
+    function renderA(tool) {
+      var nav = GROUPS.map(function (group) {
+        return '<section><h2>' + group.name + '</h2>' + group.tools.map(function (item) {
+          var on = tool && tool.id === item.id ? ' on' : ''
+          return '<button class="item' + on + '" data-act="open" data-id="' + item.id + '">' + icon(item.icon) + esc(item.name) + '</button>'
+        }).join('') + '</section>'
+      }).join('')
+      var path = tool ? '<span>' + esc(tool.groupName) + '</span><i class="el-icon-arrow-right"></i><strong>' + esc(tool.name) + '</strong>' : '<strong>未打开工具</strong>'
+      return '<div class="layout"><aside class="side"><div class="brand"><span class="mark">D</span><div><strong>Dev Admin</strong><em>本地工具</em></div></div><nav class="nav">' + nav + '</nav></aside><div class="work"><header class="top"><div class="path">' + path + '</div>' + searchHtml() + themeBtn() + '</header><div class="tabs">' + tabsHtml() + '</div>' + canvas(tool) + '</div></div>'
+    }
+    function renderB(tool) {
+      var group = groupById(state.groupId)
+      var rail = GROUPS.map(function (item) {
+        var on = item.id === state.groupId ? ' on' : ''
+        return '<button class="rail-btn' + on + '" data-act="group" data-id="' + item.id + '">' + icon(item.icon) + '<span>' + item.name + '</span></button>'
+      }).join('')
+      var panel = state.panelOpen ? '<aside class="panel"><header><div><strong>' + group.name + '</strong><em>' + group.tools.length + ' 个工具</em></div><button data-act="collapse">收起</button></header>' + group.tools.map(function (item) {
+        var on = tool && tool.id === item.id ? ' on' : ''
+        return '<button class="tool' + on + '" data-act="open" data-id="' + item.id + '">' + esc(item.name) + '</button>'
+      }).join('') + '</aside>' : ''
+      return '<div class="layout-b"><aside class="rail"><span class="mark">D</span>' + rail + '<div class="grow"></div><button class="rail-btn" data-act="theme">' + icon(state.theme === 'light' ? 'el-icon-moon' : 'el-icon-sunny') + '<span>' + (state.theme === 'light' ? '暗色' : '亮色') + '</span></button></aside>' + panel + '<section class="main"><div class="tabbar"><div class="tabs">' + tabsHtml() + '</div>' + searchHtml() + '</div>' + canvas(tool) + '</section></div>'
+    }
+    function renderC(tool) {
+      var group = groupById(state.groupId)
+      var seg = GROUPS.map(function (item) {
+        return '<button class="' + (item.id === state.groupId ? 'on' : '') + '" data-act="group" data-id="' + item.id + '">' + item.name + '</button>'
+      }).join('')
+      var chips = group.tools.map(function (item) {
+        var on = tool && tool.id === item.id ? ' on' : ''
+        return '<button class="chip' + on + '" data-act="open" data-id="' + item.id + '">' + icon(item.icon) + esc(item.name) + '</button>'
+      }).join('')
+      return '<div class="layout-c"><header class="bar"><div class="brand"><span class="mark">D</span><strong>Dev Admin</strong></div><div class="seg">' + seg + '</div><div style="flex:1"></div>' + searchHtml() + themeBtn() + '</header><div class="tools">' + chips + '</div><div class="tabs">' + tabsHtml() + '</div>' + canvas(tool) + '</div>'
+    }
+    function variantName() {
+      for (var i = 0; i < VARIANTS.length; i++) if (VARIANTS[i].key === state.variant) return VARIANTS[i].name
+      return ''
+    }
+    function render() {
+      var tool = byId(state.activeId)
+      var body = state.variant === 'B' ? renderB(tool) : state.variant === 'C' ? renderC(tool) : renderA(tool)
+      var names = state.tabs.map(function (id) { var t = byId(id); return t ? t.name : '' }).filter(Boolean).join(', ')
+      document.getElementById('app').setAttribute('data-theme', state.theme)
+      document.getElementById('app').innerHTML =
+        '<div class="chosen">已选定 A — 分组侧栏，并收进正式布局。此页保留 A / B / C，只作对照。</div>' +
+        '<div class="stage">' + body + '</div>' +
+        '<div class="switcher"><div class="pill"><span class="tag">PROTOTYPE</span><button class="arrow" data-act="prev">‹</button><div class="label">' + state.variant + ' — ' + variantName() + '</div><button class="arrow" data-act="next">›</button></div><div class="state">theme=' + state.theme + ' · tool=' + (tool ? tool.name : '无') + ' · tabs=' + (names || '无') + '</div></div>'
+      var input = document.getElementById('q')
+      if (input && state.query) {
+        input.focus()
+        input.setSelectionRange(state.query.length, state.query.length)
+      }
+      location.hash = state.variant + '-' + state.theme
+    }
+    function openTool(id) {
+      if (state.tabs.indexOf(id) === -1) state.tabs.push(id)
+      state.activeId = id
+      var tool = byId(id)
+      if (tool) state.groupId = tool.groupId
+      state.query = ''
+      state.panelOpen = true
+    }
+    function cycle(delta) {
+      var keys = VARIANTS.map(function (item) { return item.key })
+      var index = keys.indexOf(state.variant)
+      state.variant = keys[(index + delta + keys.length) % keys.length]
+    }
+    document.getElementById('app').addEventListener('click', function (event) {
+      var node = event.target.closest('[data-act]')
+      if (!node) return
+      var act = node.getAttribute('data-act')
+      var id = node.getAttribute('data-id')
+      if (act === 'open') openTool(id)
+      if (act === 'activate') state.activeId = id
+      if (act === 'close') {
+        event.stopPropagation()
+        var index = state.tabs.indexOf(id)
+        if (index !== -1) state.tabs.splice(index, 1)
+        if (state.activeId === id) state.activeId = state.tabs[index] || state.tabs[index - 1] || ''
+      }
+      if (act === 'theme') state.theme = state.theme === 'light' ? 'dark' : 'light'
+      if (act === 'group') {
+        if (state.variant === 'B' && state.groupId === id && state.panelOpen) state.panelOpen = false
+        else { state.groupId = id; state.panelOpen = true }
+      }
+      if (act === 'collapse') state.panelOpen = false
+      if (act === 'prev') cycle(-1)
+      if (act === 'next') cycle(1)
+      render()
+    })
+    document.getElementById('app').addEventListener('input', function (event) {
+      if (event.target.id === 'q') {
+        state.query = event.target.value
+        render()
+      }
+    })
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+      var tag = event.target && event.target.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      event.preventDefault()
+      cycle(event.key === 'ArrowRight' ? 1 : -1)
+      render()
+    })
+    var hash = (location.hash || '#A-light').slice(1).split('-')
+    if (hash[0] === 'B' || hash[0] === 'C') state.variant = hash[0]
+    if (hash[1] === 'dark') state.theme = 'dark'
+    render()
+  </script>
+</body>
+</html>
