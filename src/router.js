@@ -275,6 +275,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: "/skillCommander",
+    component: Layout,
+    children: [
+      {
+        path: "index",
+        name: "skillCommander",
+        component: () => import("@/views/skillCommander/index"),
+        meta: { title: "MattPocock×Superpowers", icon: "el-icon-chat-line-square", group: "other" },
+      },
+    ],
+  },
+  {
     path: '/example',
     component: Layout,
     redirect: '/example/table',
